@@ -7,6 +7,8 @@ import {useLazyRef} from '@shopify/react-hooks';
 import {InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory';
 
 import {csrfLink} from './csrf-link';
+import {createErrorHandlerLink} from './error-link';
+import {createNetworkErrorLink} from './network-error-link';
 
 interface Props<TCacheShape extends NormalizedCacheObject> {
   children?: React.ReactNode;
@@ -35,11 +37,15 @@ export function GraphQLUniversalProvider<
 
     const clientOptions = createClientOptions();
     const ssrLink = createSsrExtractableLink();
+    const errorLink = createErrorHandlerLink();
+    const networkErrorLink = createNetworkErrorLink();
     const finalLink = clientOptions.link ? clientOptions.link : undefined;
 
     const link = ApolloLink.from([
       ssrLink,
       csrfLink,
+      errorLink,
+      networkErrorLink,
       ...(finalLink ? [finalLink] : []),
     ]);
 
