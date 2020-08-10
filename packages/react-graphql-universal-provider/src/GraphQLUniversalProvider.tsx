@@ -5,11 +5,8 @@ import {useSerialized} from '@shopify/react-html';
 import {ApolloProvider, createSsrExtractableLink} from '@shopify/react-graphql';
 import {useLazyRef} from '@shopify/react-hooks';
 import {InMemoryCache, NormalizedCacheObject} from 'apollo-cache-inmemory';
-import {useRequestHeader} from '@shopify/react-network';
-import {Header} from '@shopify/network';
 
 import {csrfLink} from './csrf-link';
-import {createRequestIdLink} from './request-id-link';
 
 interface Props<TCacheShape extends NormalizedCacheObject> {
   children?: React.ReactNode;
@@ -23,8 +20,6 @@ export function GraphQLUniversalProvider<
   const [initialData, Serialize] = useSerialized<TCacheShape | undefined>(
     'apollo',
   );
-
-  const requestId = useRequestHeader(Header.RequestId);
 
   const [client, ssrLink] = useLazyRef<
     [
@@ -40,16 +35,11 @@ export function GraphQLUniversalProvider<
 
     const clientOptions = createClientOptions();
     const ssrLink = createSsrExtractableLink();
-
-    // only pass request id if the GraphQL request is part of server side render
-    const requestIdLink =
-      requestId && server ? createRequestIdLink(requestId) : undefined;
     const finalLink = clientOptions.link ? clientOptions.link : undefined;
 
     const link = ApolloLink.from([
       ssrLink,
       csrfLink,
-      ...(requestIdLink ? [requestIdLink] : []),
       ...(finalLink ? [finalLink] : []),
     ]);
 
