@@ -31,7 +31,7 @@ interface Options {
 export function createServer(options: Options): Server {
   const {
     /* eslint-disable no-process-env */
-    ip = process.env.REACT_SERVER_IP || 'localhost',
+    ip = process.env.REACT_SERVER_IP || '0.0.0.0',
     port = (process.env.REACT_SERVER_PORT &&
       parseInt(process.env.REACT_SERVER_PORT, 10)) ||
       8081,
@@ -56,7 +56,7 @@ export function createServer(options: Options): Server {
 
   app.use(createRender(render, {assetPrefix, assetName, renderError}));
 
-  return app.listen(port || 3000, ip, () => {
+  return app.listen(port, ip, () => {
     logger.log(`started react-server on ${ip}:${port}`);
   });
 }
